@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Host Identifier",
+  "description": "Shows which host the current tab is on.",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Show current host"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["tabs", "scripting", "activeTab", "storage"],
+  "host_permissions": ["<all_urls>"]
+}
