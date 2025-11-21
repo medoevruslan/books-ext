@@ -1,119 +1,76 @@
 const data = window.bookAutoFillData;
 
-console.log("data is ::", data);
-
-const setValue = (selector, value, isEnterClick = false) => {
-  const el = document.querySelector(selector);
-  if (!el) return console.warn("Not found:", selector);
-
-  const proto = Object.getPrototypeOf(el);
-  const setter = Object.getOwnPropertyDescriptor(proto, "value").set;
-
-  setter.call(el, value);
-
-  el.dispatchEvent(new Event("input", { bubbles: true }));
-
-  if (isEnterClick) {
-    ["keydown", "keypress", "keyup"].forEach((type) => {
-      el.dispatchEvent(
-        new KeyboardEvent(type, {
-          key: "Enter",
-          code: "Enter",
-          keyCode: 13,
-          which: 13,
-          bubbles: true,
-        })
-      );
-    });
-  }
+const LABELS = {
+  title: ["Название", "Title"],
+  subtitle: ["Подзаголовок", "Subtitle"],
+  description: ["Описание", "Description"],
+  bookId: ["Идентификатор книги", "Book ID"],
+  language: ["Язык", "Language"],
+  publisher: ["Издатель", "Publisher"],
+  pages: ["Количество страниц", "Page count", "Number of pages"],
+  releaseDate: ["Дата выпуска", "Release date"],
+  publicationDate: ["Дата публикации", "Publication date"],
+  minAge: ["Минимальный возраст", "Minimum age"],
+  maxAge: ["Максимальный возраст", "Maximum age"],
+  adult: ["Для совершеннолетних?", "For mature audiences?"],
+  save: ["Сохранить", "Save"],
+  saveContinue: ["Сохранить и продолжить", "Save and continue"]
 };
 
-// Title
-if (data.title) setValue('input[aria-label="book title"]', data.title);
-
-// Volume
-if (data.volume) setValue('input[aria-label="volume number"]', data.volume);
-
-// Search Terms
-if (data.searchTerms)
-  setValue('input[aria-label="search terms"]', data.searchTerms, true);
-
-// ================== addBisacCodes
-
-async function addBisacCodes(codes) {
-  const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-
-  const bisacFilterSelector = "#filter-bisacs";
-  // 1. Find the subject list root (left-side BISAC list)
-  const root = document.querySelector(bisacFilterSelector);
-  if (!root) {
-    console.warn("Cannot find BISAC subject root");
-    return;
-  }
-
-  let found = 0;
-  let maxBisacCount = 5;
-
-  for (const code of codes) {
-    if (found === maxBisacCount) break;
-
-    console.log("Trying BISAC:", code);
-
-    // 2. Set filter to the specific code
-    setValue(bisacFilterSelector, code);
-
-    // 3. Wait for the list to filter (simple delay)
-    await delay(500);
-
-    const visited = new Set();
-    let attempts = 0;
-    const maxAttempts = 50;
-
-
-    // Loop to find the item, expanding categories if necessary
-    while (found <= maxBisacCount && attempts < maxAttempts) {
-      attempts++;
-
-      // 4. Try to find the element that matches the code directly
-      const item = document.querySelector(`div[data-code^="${code}"]`);
-
-      if (item) {
-        console.log("Clicking BISAC:", code);
-        item.click();
-        found++;
-        await delay(300);
-        break; // Move to next code
-      }
-
-      // 5. If not found, look for expandable categories
-      // Categories have data-literal but NO data-code (or undefined/empty)
-      const candidates = Array.from(document.querySelectorAll("div[data-literal]"))
-        .filter(el => !el.dataset.code && !visited.has(el));
-
-      if (candidates.length === 0) {
-        console.warn("BISAC code not found and no more categories to expand:", code);
-        break;
-      }
-
-      // 6. Expand the first unvisited category
-      // We assume that since we filtered by the code, any visible category *might* contain our item
-      const categoryToExpand = candidates[0];
-      console.log("Expanding category:", categoryToExpand.dataset.literal);
-
-      visited.add(categoryToExpand);
-      categoryToExpand.click();
-
-      // Wait for expansion
-      await delay(500);
-    }
-
-    if (!found) {
-      console.warn("Failed to find BISAC code after expansion:", code);
+function findInputByLabels(labelArray) {
+  for (const text of labelArray) {
+    const elems = [...document.querySelectorAll('*')]
+    const elem = elems.find(el => el.textContent.trim() === text);
+    if (elem) {
+      return elem.parentElement.querySelector('input, textarea, [contenteditable]');
     }
   }
+  return null;
 }
 
-if (window.bookAutoFillData.categories) {
-  const bisacList = window.bookAutoFillData.categories; // array of codes
-  addBisacCodes(bisacList);
+
+const titleInput = findInputByLabels(LABELS.title);
+if (titleInput) {
+  titleInput.focus()
+  titleInput.value = data.title;
+  titleInput.dispatchEvent(new Event('input', { bubbles: true }));
 }
+
+const desc = findInputByLabels(LABELS.description);
+if (desc) {
+  desc.focus();
+  desc.innerHTML = data.description.replace(/\n/g, "<br>"); // keep line breaks
+  desc.dispatchEvent(new InputEvent("input", { bubbles: true }));
+}
+
+const publisher = findInputByLabels(LABELS.publisher);
+if (publisher) {
+  publisher.focus();
+  publisher.value = data.publisher;
+  publisher.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+const minAge = findInputByLabels(LABELS.minAge);
+if (minAge) {
+  minAge.focus();
+  minAge.value = 18;
+  minAge.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+
+// value: true (adult), false (not adult)
+const yesLabels = ["Да", "Yes"];
+const noLabels = ["Нет", "No"];
+
+const adultButtons = document.querySelectorAll('button[role="option"]');
+if (adultButtons.length > 0) {
+  const targetLabels = yesLabels;
+  const buttons = Array.from(adultButtons);
+
+  const target = buttons.find(b => {
+    const spans = Array.from(b.querySelectorAll("span"));
+    return spans.some(sp => targetLabels.includes(sp.textContent.trim()));
+  });
+  target?.click();
+}
+
