@@ -1,17 +1,47 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Host Identifier</title>
-    <link rel="stylesheet" href="popup.css" />
-  </head>
-  <body>
-    <main>
-      <h1>Current Host</h1>
-      <p id="status" class="status">Detecting…</p>
-      <p id="host" class="host"></p>
-      <button id="fillBtn">Fill Form</button>
-    </main>
-    <script type="module" src="popup.js"></script>
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Host Identifier</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Current Host</h1>
+    <p id="status" class="status">Detecting…</p>
+    <p id="host" class="host"></p>
+    <button id="fillPage">Fill Page</button>
+
+    <hr />
+
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input type="text" id="title" placeholder="Book Title" />
+    </div>
+
+    <div class="form-group">
+      <label for="publisher">Publisher</label>
+      <input type="text" id="publisher" placeholder="Publisher Name" />
+    </div>
+
+    <div class="form-group">
+      <label for="searchTerms">Search Terms (comma separated)</label>
+      <textarea id="searchTerms" rows="3" placeholder="term1, term2, ..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="categories">Categories (comma separated codes)</label>
+      <textarea id="categories" rows="3" placeholder="POL042020, REL084000, ..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" rows="5" placeholder="Book Description..."></textarea>
+    </div>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+
 </html>

@@ -26,35 +26,57 @@ async function detectHost() {
 
 const host = detectHost();
 
-document.getElementById("fillBtn").onclick = async () => {
-  // const fileInput = document.getElementById("fileInput").files[0];
-  // if (!fileInput) return alert("Choose a file");
+// Load saved data
+document.addEventListener('DOMContentLoaded', async () => {
+  const data = await chrome.storage.local.get([
+    'title', 'publisher', 'searchTerms', 'categories', 'description'
+  ]);
 
-  // const text = await fileInput.text();
-  // const bookData = JSON.parse(text);
+  if (data.title) document.getElementById('title').value = data.title;
+  if (data.publisher) document.getElementById('publisher').value = data.publisher;
+  if (data.searchTerms) document.getElementById('searchTerms').value = data.searchTerms;
+  if (data.categories) document.getElementById('categories').value = data.categories;
+  if (data.description) document.getElementById('description').value = data.description;
+
+  validateForm();
+});
+
+function validateForm() {
+  const title = document.getElementById('title').value.trim();
+  const publisher = document.getElementById('publisher').value.trim();
+  const searchTerms = document.getElementById('searchTerms').value.trim();
+  const description = document.getElementById('description').value.trim();
+
+  const isValid = title && publisher && searchTerms && description;
+  const btn = document.getElementById("fillPage");
+  btn.disabled = !isValid;
+  btn.title = isValid ? "" : "Please fill Title, Publisher, Search Terms, and Description";
+}
+
+['title', 'publisher', 'searchTerms', 'description'].forEach(id => {
+  document.getElementById(id).addEventListener('input', validateForm);
+});
+
+document.getElementById("fillPage").onclick = async () => {
+  const title = document.getElementById('title').value;
+  const publisher = document.getElementById('publisher').value;
+  const searchTerms = document.getElementById('searchTerms').value;
+  const categoriesStr = document.getElementById('categories').value;
+  const description = document.getElementById('description').value;
+
+  // Save data
+  await chrome.storage.local.set({
+    title, publisher, searchTerms, categories: categoriesStr, description
+  });
+
+  const categories = categoriesStr.split(',').map(c => c.trim()).filter(Boolean);
 
   const bookData = {
-    title: "Без свидетелей. Геноцид веры",
-    searchTerms:
-      "антикультовая сеть, антикультовое движение, риторика ненависти, жертвы антикульта, изъятие детей, секты, культы, Александр Дворкин, РАЦИРС, FECRIS, идеологи ненависти, манипуляция сознанием, гонения на верующих, гонения за веру, борьба с сектами, репрессии, сектоведение, дегуманизация, информационные войны, псевдонаучные экспертизы, промывание мозгов, манипуляция общественным сознанием, антикультовая риторика, свобода совести, свобода вероисповедания, стигматизация, Свидетели Иеговы, религиозная дискриминация, нацизм",
-    categories: [
-      "POL042020",
-      "REL084000",
-      "POL038000",
-      "REL108020",
-      "SOC031000",
-      "HIS032000",
-      "POL030000",
-      "REL070000",
-      "TRU002010",
-    ],
-    publisher: 'Элиас Уитмор',
-    description: `"Без свидетелей. Геноцид веры" — это хроника человеческого достоинства, поставленного на кон в условиях, где вера становится смертным приговором. Через историю одной восьмилетней девочки автор разворачивает панораму, где под видом защиты от «деструктивных культов» возродились практики, позабытые со времен нацизма.
-Книга начинается с драмы — с истории ребенка, чьи родители — Свидетели Иеговы, обычные законопослушные люди, в одно утро превращаются во "врагов государства". За этим следуют обыски, аресты, изъятие детей. Но самое страшное ждет детей в приютах, оказавшихся под контролем тех же структур, которые инициировали гонения.
-Автор показывает, как работает механизм дегуманизации: сначала создается язык ненависти, где верующие называются "раковой опухолью" и "недочеловеками", затем этот язык становится основой для "экспертиз", а те — оправданием для пыток и репрессий. Пыточные комнаты в СИЗО, где людей душат пакетами, избивают электрошокерами, держат в ледяных камерах без окон — все это отлаженная система.
-Особое внимание уделяется международной антикультовой сети. Александр Дворкин и его РАЦИРС предстают не как маргинальные фанатики, а как часть глобальной сети, включая их европейских хаб FECRIS (финансируется французским правительством и обладает статусом при ООН). Их идеология, как показывает автор, напрямую восходит к теологам Третьего рейха, считавшим борьбу с "еретиками" формой очищения нации.
-Но книга — не только о системе. Она о людях, которые в условиях тотального давления сохранили совесть. Адвокаты, рискующие карьерой ради правды; ученые, противостоящие лжеэкспертизам; журналисты, прорывающие информационную блокаду; и сами верующие, стойкие в гонениях.
-Эта книга - манифест о выборе, который стоит перед каждым в эпоху, когда молчание становится соучастием. Это не просто документальное повествование, а призыв к пробуждению совести в мире, где зло снова зазвучало, прикрываясь красивыми словами.`
+    title,
+    publisher,
+    searchTerms,
+    categories,
+    description
   };
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
