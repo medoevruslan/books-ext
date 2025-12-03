@@ -72,7 +72,6 @@ export function run(data) {
       console.warn("Tags not found - please provide tags list");
     } else if (tagInput) {
       const validatedTags = tags.map(t => t.trim()).flatMap(t => t.split(/\s+/)).filter(t => t.length > 2)
-      debugger
       fillTags(validatedTags)
     }
 

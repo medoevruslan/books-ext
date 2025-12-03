@@ -1,42 +1,34 @@
 (async () => {
 
-    const hostOptions = {
-        'play.google.com': {
-            about: 'content-gbooks-about.js',
-            genres: 'content-gbooks-genres.js'
-        },
-        'draft2digital.com': 'content-d2d.js',
-        'www.wattpad.com': 'content-wattpad.js',
-        'www.lulu.com': {
-            start: 'content-lulu-start.js',
-            copyright: 'content-lulu-copyright.js',
-            details: 'content-lulu-details.js'
-        }
+    const routes = {
+        'play.google.com': [
+            { pattern: /about/, script: 'content-gbooks-about.js' },
+            { pattern: /genres/, script: 'content-gbooks-genres.js' }
+        ],
+        'draft2digital.com': [
+            { pattern: /.*/, script: 'content-d2d.js' }
+        ],
+        'www.wattpad.com': [
+            { pattern: /.*/, script: 'content-wattpad.js' }
+        ],
+        'www.lulu.com': [
+            { pattern: /start/, script: 'content-lulu-start.js' },
+            { pattern: /copyright/, script: 'content-lulu-copyright.js' },
+            { pattern: /details/, script: 'content-lulu-details.js' }
+        ]
     };
 
     const currentHost = window.location.hostname;
     const currentUrl = window.location.href;
-    const data = window.bookAutoFillData
+    const data = window.bookAutoFillData;
 
     let scriptToLoad = null;
 
-    if (hostOptions[currentHost]) {
-        const options = hostOptions[currentHost];
-        if (typeof options === 'string') {
-            scriptToLoad = options;
-        } else {
-            // It's an object with path keys
-            if (currentUrl.includes('about') && options.about) {
-                scriptToLoad = options.about;
-            } else if (currentUrl.includes('genres') && options.genres) {
-                scriptToLoad = options.genres;
-            } else if (currentUrl.includes('start') && options.start) {
-                scriptToLoad = options.start
-            } else if (currentUrl.includes('copyright') && options.copyright) {
-                scriptToLoad = options.copyright
-            } else if (currentUrl.includes('details') && options.details) {
-                scriptToLoad = options.details
-            }
+    if (routes[currentHost]) {
+        const hostRoutes = routes[currentHost];
+        const match = hostRoutes.find(route => route.pattern.test(currentUrl));
+        if (match) {
+            scriptToLoad = match.script;
         }
     }
 
