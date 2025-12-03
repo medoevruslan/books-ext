@@ -5,11 +5,18 @@
             about: 'content-gbooks-about.js',
             genres: 'content-gbooks-genres.js'
         },
-        'draft2digital.com': 'content-d2d.js'
+        'draft2digital.com': 'content-d2d.js',
+        'www.wattpad.com': 'content-wattpad.js',
+        'www.lulu.com': {
+            start: 'content-lulu-start.js',
+            copyright: 'content-lulu-copyright.js',
+            details: 'content-lulu-details.js'
+        }
     };
 
     const currentHost = window.location.hostname;
     const currentUrl = window.location.href;
+    const data = window.bookAutoFillData
 
     let scriptToLoad = null;
 
@@ -23,6 +30,12 @@
                 scriptToLoad = options.about;
             } else if (currentUrl.includes('genres') && options.genres) {
                 scriptToLoad = options.genres;
+            } else if (currentUrl.includes('start') && options.start) {
+                scriptToLoad = options.start
+            } else if (currentUrl.includes('copyright') && options.copyright) {
+                scriptToLoad = options.copyright
+            } else if (currentUrl.includes('details') && options.details) {
+                scriptToLoad = options.details
             }
         }
     }
@@ -31,7 +44,13 @@
         console.log(`[Host Identifier] Loading script: ${scriptToLoad}`);
         try {
             const src = chrome.runtime.getURL(scriptToLoad);
-            await import(src);
+            const module = await import(src);
+            if (module && typeof module.run === 'function') {
+                console.log(`[Host Identifier] Running script logic for: ${scriptToLoad}`);
+                await module.run(data);
+            } else {
+                console.warn(`[Host Identifier] Module ${scriptToLoad} does not export a run function.`);
+            }
         } catch (err) {
             console.error(`[Host Identifier] Failed to load script: ${scriptToLoad}`, err);
         }

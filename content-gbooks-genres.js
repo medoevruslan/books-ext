@@ -1,7 +1,3 @@
-const data = window.bookAutoFillData;
-
-console.log("data is ::", data);
-
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const setValue = async (element, value, isEnterClick = false) => {
@@ -51,34 +47,38 @@ const setValue = async (element, value, isEnterClick = false) => {
 };
 
 
-const inputsWrapper = document.querySelector('subjects-input');
-const addBisacBtn = inputsWrapper.querySelector(':scope > button');
+export async function run(data) {
+  console.log("data is ::", data);
 
-let inputAddAttempt = 0
+  const inputsWrapper = document.querySelector('subjects-input');
+  const addBisacBtn = inputsWrapper.querySelector(':scope > button');
 
-async function fillBisacs(codes) {
-  for (let i = 0; i < codes.length; i++) {
-    let input = inputsWrapper.querySelectorAll('input')[i];
+  let inputAddAttempt = 0
 
-    if (!input) {
-      addBisacBtn.click();
-      await delay(200); // Wait for input to appear
-
-      // Re-query input after adding
-      input = inputsWrapper.querySelectorAll('input')[i];
+  async function fillBisacs(codes) {
+    for (let i = 0; i < codes.length; i++) {
+      let input = inputsWrapper.querySelectorAll('input')[i];
 
       if (!input) {
-        throw new Error(`Bisacs input ${i} not found even after clicking add`);
+        addBisacBtn.click();
+        await delay(200); // Wait for input to appear
+
+        // Re-query input after adding
+        input = inputsWrapper.querySelectorAll('input')[i];
+
+        if (!input) {
+          throw new Error(`Bisacs input ${i} not found even after clicking add`);
+        }
       }
+
+      await delay(500);
+      await setValue(input, codes[i], true);
+      await delay(1000);
     }
-
-    await delay(500);
-    await setValue(input, codes[i], true);
-    await delay(1000);
   }
-}
 
-if (data.categories) {
-  fillBisacs(data.categories)
+  if (data.categories) {
+    await fillBisacs(data.categories)
+  }
 }
 

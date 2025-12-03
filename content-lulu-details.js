@@ -1,7 +1,3 @@
-const data = window.bookAutoFillData;
-
-console.log("data is ::", data);
-
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const setValue = async (element, value, isEnterClick = false) => {
@@ -30,10 +26,11 @@ const setValue = async (element, value, isEnterClick = false) => {
       );
     });
   }
-
 };
 
-(async function fillDetails() {
+export async function run() {
+  const data = window.bookAutoFillData;
+
   const description = document.querySelector('#description');
 
   if (data.description && description) {
@@ -50,7 +47,6 @@ const setValue = async (element, value, isEnterClick = false) => {
 
 
   const keywordsInput = document.querySelector('input[aria-label=Keywords]');
-  debugger
   if (keywordsInput && data.searchTerms.length > 0) {
     const terms = data.searchTerms.split(',').map(t => t.trim()).filter(Boolean)
     const MAX_KEYWORDS = Math.min(50, terms.length)
@@ -61,7 +57,7 @@ const setValue = async (element, value, isEnterClick = false) => {
     }
   }
 
-})()
+}
 
 
 

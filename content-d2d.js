@@ -1,7 +1,3 @@
-const data = window.bookAutoFillData;
-
-console.log("data is ::", data);
-
 const setValue = (selector, value, isEnterClick = false) => {
   const el = document.querySelector(selector);
   if (!el) return console.warn("Not found:", selector);
@@ -27,18 +23,6 @@ const setValue = (selector, value, isEnterClick = false) => {
     });
   }
 };
-
-// Title
-if (data.title) setValue('input[aria-label="book title"]', data.title);
-
-// Volume
-if (data.volume) setValue('input[aria-label="volume number"]', data.volume);
-
-// Search Terms
-if (data.searchTerms)
-  setValue('input[aria-label="search terms"]', data.searchTerms, true);
-
-// ================== addBisacCodes
 
 async function addBisacCodes(codes) {
   const delay = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -113,7 +97,22 @@ async function addBisacCodes(codes) {
   }
 }
 
-if (window.bookAutoFillData.categories) {
-  const bisacList = window.bookAutoFillData.categories; // array of codes
-  addBisacCodes(bisacList);
+export function run(data) {
+  console.log("data is ::", data);
+
+  // Title
+  if (data.title) setValue('input[aria-label="book title"]', data.title);
+
+  // Volume
+  if (data.volume) setValue('input[aria-label="volume number"]', data.volume);
+
+  // Search Terms
+  if (data.searchTerms)
+    setValue('input[aria-label="search terms"]', data.searchTerms, true);
+
+  // ================== addBisacCodes
+  if (data.categories) {
+    const bisacList = data.categories; // array of codes
+    addBisacCodes(bisacList);
+  }
 }
