@@ -15,8 +15,6 @@ async function detectHost() {
 
     const url = new URL(tab.url);
 
-    console.log('url:: is::: ', url);
-
     hostEl.textContent = url.host || "(no host)";
     statusEl.textContent = "You're currently on:";
     return url.host
