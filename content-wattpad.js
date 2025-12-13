@@ -50,7 +50,11 @@ export function run(data) {
 
     const description = target.querySelector('.form-group.description-form textarea');
     if (description && data.description) {
-      setValue(description, data.description);
+      if (description.length <= 2000) {
+        setValue(description, data.description);
+      } else if (data.shortDescription) {
+        setValue(description, data.shortDescription);
+      }
     }
 
     const TAGS_LIMIT = 26;
