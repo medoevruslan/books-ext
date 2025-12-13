@@ -24,6 +24,25 @@ const setValue = (selector, value, isEnterClick = false) => {
   }
 };
 
+function waitForSelector(sel) {
+  return new Promise(resolve => {
+    const observer = new MutationObserver(() => {
+      const el = document.querySelector(sel);
+      if (el) {
+        observer.disconnect();
+        resolve(el)
+      }
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    const initial = document.querySelector(sel);
+    if (initial) {
+      observer.disconnect()
+      resolve(initial)
+    }
+  })
+}
+
 async function addBisacCodes(codes) {
   const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -47,7 +66,7 @@ async function addBisacCodes(codes) {
     setValue(bisacFilterSelector, code);
 
     // 3. Wait for the list to filter (simple delay)
-    await delay(500);
+    await delay(2000);
 
     const visited = new Set();
     let attempts = 0;
@@ -65,12 +84,13 @@ async function addBisacCodes(codes) {
         console.log("Clicking BISAC:", code);
         item.click();
         found++;
-        await delay(300);
+        await delay(1000);
         break; // Move to next code
       }
 
       // 5. If not found, look for expandable categories
       // Categories have data-literal but NO data-code (or undefined/empty)
+      await waitForSelector("div[data-literal]")
       const candidates = Array.from(document.querySelectorAll("div[data-literal]"))
         .filter(el => !el.dataset.code && !visited.has(el));
 
@@ -88,7 +108,7 @@ async function addBisacCodes(codes) {
       categoryToExpand.click();
 
       // Wait for expansion
-      await delay(500);
+      await delay(1000);
     }
 
     if (!found) {
@@ -97,7 +117,7 @@ async function addBisacCodes(codes) {
   }
 }
 
-export function run(data) {
+export async function run(data) {
   console.log("data is ::", data);
 
   // Title
@@ -110,9 +130,16 @@ export function run(data) {
   if (data.searchTerms)
     setValue('input[aria-label="search terms"]', data.searchTerms, true);
 
+
+  const targetAudience = document.querySelector('#target-audience-age-1')
+  if (targetAudience) {
+    targetAudience.click()
+    targetAudience.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
   // ================== addBisacCodes
   if (data.categories) {
     const bisacList = data.categories; // array of codes
-    addBisacCodes(bisacList);
+    await addBisacCodes(bisacList);
   }
 }

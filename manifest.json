@@ -10,12 +10,34 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["tabs", "scripting", "activeTab", "storage"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": [
+    "tabs",
+    "scripting",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://draft2digital.com/*"
+      ],
+      "js": [
+        "hook-ckeditor.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
   "web_accessible_resources": [
     {
-      "resources": ["content-*.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "content-*.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }

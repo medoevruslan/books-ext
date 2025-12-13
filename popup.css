@@ -40,6 +40,18 @@ button {
   font-size: 16px;
 }
 
+button+button {
+  margin-top: 10px;
+}
+
+button#resetForm {
+  background-color: #f6644e;
+}
+
+button#resetForm:hover {
+  background-color: #ff2200;
+}
+
 button:hover {
   background-color: #0056b3;
 }
@@ -53,4 +65,17 @@ hr {
   margin: 15px 0;
   border: 0;
   border-top: 1px solid #ccc;
+}
+
+.support-status {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.support-status.supported {
+  color: green;
+}
+
+.support-status.unsupported {
+  color: red;
 }

@@ -42,9 +42,8 @@ export async function run() {
 
   if (data.searchTerms && tableOfContent) {
     tableOfContent.value = data.searchTerms
-    description.dispatchEvent(new Event('input', { bubbles: true }))
+    // description.dispatchEvent(new Event('input', { bubbles: true }))
   }
-
 
   const keywordsInput = document.querySelector('input[aria-label=Keywords]');
   if (keywordsInput && data.searchTerms.length > 0) {

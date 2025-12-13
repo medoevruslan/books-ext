@@ -17,8 +17,6 @@ function waitForSelector(sel) {
       resolve(initial)
     }
   })
-
-
 }
 
 export async function run() {

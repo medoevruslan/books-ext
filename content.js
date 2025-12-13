@@ -6,7 +6,8 @@
             { pattern: /genres/, script: 'content-gbooks-genres.js' }
         ],
         'draft2digital.com': [
-            { pattern: /.*/, script: 'content-d2d.js' }
+            { pattern: /\/book\/e\/\d+$/, script: 'content-d2d-description.js' },
+            { pattern: /\/book\/m\/\d+\/ebook$/, script: 'content-d2d-main.js' }
         ],
         'www.wattpad.com': [
             { pattern: /.*/, script: 'content-wattpad.js' }
